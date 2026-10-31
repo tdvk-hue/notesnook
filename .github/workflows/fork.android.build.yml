@@ -28,11 +28,18 @@ jobs:
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=core
 
+      # builds @notesnook/crypto, intl, logger etc. before core
+      - name: Build core and its internal packages
+        run: npm run tx core:build
+
       - name: Type check core
         run: cd packages/core && npx tsc --noEmit
 
       - name: Homepage filter tests
-        run: cd packages/core && npx vitest run __tests__/homepage.test.ts __tests__/notebooks.test.js __tests__/notes.test.ts __tests__/migrations.test.ts __tests__/sql-migrations.test.ts
+        run: |
+          cd packages/core
+          node scripts/prebuild.mjs
+          npx vitest run __tests__/homepage.test.ts __tests__/notebooks.test.js __tests__/notes.test.ts __tests__/migrations.test.ts __tests__/sql-migrations.test.ts
 
   android:
     needs: core-tests
