@@ -45,11 +45,7 @@ const isDesktop = process.env.PLATFORM === "desktop";
 const isThemeBuilder = process.env.THEME_BUILDER === "true";
 const isAnalyzing = process.env.ANALYZING === "true";
 
-// Fork: allow hosting under a sub path (e.g. GitHub Pages /notesnook/)
-const basePath = (process.env.NN_BASE_PATH || "/").replace(/\/?$/, "/");
-
 export default defineConfig({
-  base: basePath,
   envPrefix: "NN_",
   root: "src/",
   publicDir: isThemeBuilder ? path.join(__dirname, "public") : "../public",
@@ -83,7 +79,6 @@ export default defineConfig({
     GIT_HASH: `"${gitHash}"`,
     APP_VERSION: `"${version}"`,
     PUBLIC_URL: `"${process.env.PUBLIC_URL || ""}"`,
-    BASE_PATH: JSON.stringify(basePath.replace(/\/$/, "")),
     IS_DESKTOP_APP: isDesktop,
     PLATFORM: `"${process.env.PLATFORM}"`,
     IS_TESTING: process.env.TEST === "true",

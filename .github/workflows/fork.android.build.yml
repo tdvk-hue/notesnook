@@ -1,4 +1,4 @@
-name: Fork - Homepage filter builds
+name: Fork - Homepage filter APK
 
 # Builds an installable arm64 APK of the fork (signed with the repo's public
 # debug keystore, application id suffixed ".homefork" so it installs next to
@@ -15,43 +15,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Real Notesnook web app with the fork's changes, published to the
-  # gh-pages branch -> https://tdvk-hue.github.io/notesnook/
-  web:
-    runs-on: ubuntu-22.04
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Setup Node
-        uses: ./.github/actions/setup-node-with-cache
-
-      - name: Install
-        run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=web
-
-      - name: Build web app for /notesnook/
-        env:
-          NN_BASE_PATH: /notesnook/
-          PUBLIC_URL: /notesnook
-        run: npm run build:web
-
-      - name: Publish to gh-pages branch
-        run: |
-          set -euo pipefail
-          cd apps/web/build
-          find . -name "*.map" -delete
-          cp index.html 404.html
-          touch .nojekyll
-          git init -q -b gh-pages
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -q -m "web build ${GITHUB_SHA::7}"
-          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
-
   core-tests:
     runs-on: ubuntu-22.04
     steps:
