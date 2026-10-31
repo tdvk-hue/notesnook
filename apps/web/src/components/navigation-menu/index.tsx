@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Box, Button, Flex, Image, Text } from "@theme-ui/components";
 import {
-  Note,
   StarOutline,
   Monographs,
   Trash,
@@ -133,7 +132,8 @@ type Route = {
 };
 
 const routes: Route[] = [
-  { id: "notes", title: strings.routes.Notes(), path: "/notes", icon: Note },
+  // Fork: make it obvious this is the filtered homepage list
+  { id: "notes", title: "Notes – Homepage", path: "/notes", icon: Home },
   {
     id: "favorites",
     title: strings.routes.Favorites(),

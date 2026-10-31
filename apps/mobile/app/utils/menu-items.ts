@@ -36,8 +36,9 @@ export const MenuItemsList: SideMenuItem[] = [
   {
     dataType: "note",
     id: "Notes",
-    title: "Notes",
-    icon: "note-outline",
+    // Fork: make it obvious this is the filtered homepage list
+    title: "Notes – Homepage",
+    icon: "home-outline",
     type: "side-menu-item"
   },
   // {
