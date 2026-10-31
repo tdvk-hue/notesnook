@@ -15,6 +15,33 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Builds the web app and keeps it as a downloadable build file on the run
+  # (not published anywhere), so it can be opened inside the Claude app.
+  web:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Install
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=web
+
+      - name: Build web app
+        run: npm run build:web
+
+      - name: Keep build as run artifact
+        run: find apps/web/build -name "*.map" -delete
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: notesnook-web-build
+          path: apps/web/build
+          retention-days: 3
+
   core-tests:
     runs-on: ubuntu-22.04
     steps:
