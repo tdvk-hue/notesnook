@@ -277,6 +277,8 @@ export class Notes implements ICollection {
         .innerJoin("notebooks", "notebooks.id", "relations.fromId")
         .where("relations.fromType", "==", "notebook")
         .where("relations.toType", "==", "note")
+        // NOT IN with a NULL in the list matches nothing in SQL
+        .where("relations.toId", "is not", null)
         .where((eb) =>
           eb.and([
             eb.or([
@@ -301,7 +303,8 @@ export class Notes implements ICollection {
               ])
             : eb("notebooks.showOnHomepage", "==", false)
         )
-        .select("relations.toId");
+        .select("relations.toId")
+        .$castTo<{ toId: string }>();
 
     return this.collection.createFilter<Note>(
       (qb) =>
