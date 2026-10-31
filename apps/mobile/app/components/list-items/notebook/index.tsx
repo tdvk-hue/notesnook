@@ -158,6 +158,18 @@ export const NotebookItem = ({
               {strings.notes(totalNotes)}
             </Paragraph>
 
+            {(item as Notebook).showOnHomepage === false ? (
+              // Fork: passive marker; the setting lives in the notebook sheet
+              <Icon
+                name="home-off-outline"
+                size={AppFontSize.sm}
+                style={{
+                  marginRight: 10,
+                  marginTop: 2
+                }}
+                color={colors.secondary.icon}
+              />
+            ) : null}
             {item.pinned ? (
               <Icon
                 name="pin-outline"

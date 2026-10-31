@@ -715,10 +715,30 @@ export const useActions = ({
       isToggle: true,
       checked: includedOnHomepage,
       onPress: async () => {
-        await db.notebooks.showOnHomepage(!includedOnHomepage, item.id);
-        setItem((await db.notebooks.notebook(item.id)) as Item);
-        useNoteStore.getState().refresh();
-        Navigation.queueRoutesForUpdate();
+        const apply = async (value: boolean) => {
+          await db.notebooks.showOnHomepage(value, item.id);
+          setItem((await db.notebooks.notebook(item.id)) as Item);
+          useNoteStore.getState().refresh();
+          Navigation.queueRoutesForUpdate();
+        };
+        await apply(!includedOnHomepage);
+        const hasChildren =
+          (await db.relations.from(item, "notebook").count()) > 0;
+        ToastManager.show({
+          heading: includedOnHomepage
+            ? "Notes hidden from Notes \u2013 Homepage"
+            : "Notes shown on Notes \u2013 Homepage",
+          message: hasChildren
+            ? "Sub-notebooks keep their own setting."
+            : undefined,
+          type: "success",
+          context: "local",
+          actionText: "Undo",
+          func: () => {
+            ToastManager.hide();
+            apply(includedOnHomepage);
+          }
+        });
       }
     });
   }

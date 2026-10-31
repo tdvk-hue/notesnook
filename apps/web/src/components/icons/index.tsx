@@ -52,6 +52,7 @@ import {
   mdiGlasses,
   mdiCogOutline,
   mdiHomeOutline,
+  mdiHomeOffOutline,
   mdiRecycle,
   mdiSync,
   mdiSyncOff,
@@ -368,6 +369,8 @@ export const FocusMode = createIcon(mdiGlasses);
 export const NormalMode = createIcon(mdiSunglasses);
 export const Settings = createIcon(mdiCogOutline);
 export const Home = createIcon(mdiHomeOutline);
+// Fork: shown on notebooks whose notes are kept off Notes – Homepage
+export const HomeOff = createIcon(mdiHomeOffOutline);
 export const Restore = createIcon(mdiRecycle);
 export const Sync = createIcon(mdiSync);
 export const SyncOff = createIcon(mdiSyncOff);

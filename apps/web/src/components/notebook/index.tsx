@@ -34,7 +34,8 @@ import {
   Move,
   Copy,
   InternalLink,
-  Home
+  Home,
+  HomeOff
 } from "../icons";
 import { MenuItem } from "@notesnook/ui";
 import { hashNavigate, navigate } from "../../navigation";
@@ -171,9 +172,17 @@ export function Notebook(props: NotebookProps) {
         </Flex>
       }
       footer={
-        <Text variant="subBody">
-          {currentContext ? currentContext?.length : totalNotes}
-        </Text>
+        <Flex sx={{ alignItems: "center", gap: "small" }}>
+          <Text variant="subBody">
+            {currentContext ? currentContext?.length : totalNotes}
+          </Text>
+          {item.showOnHomepage === false ? (
+            // Fork: passive marker; the setting itself lives in the menu
+            <Flex title="Hidden from Notes – Homepage">
+              <HomeOff size={12} color="icon" />
+            </Flex>
+          ) : null}
+        </Flex>
       }
       menuItems={notebookMenuItems}
       context={{ refresh, isRoot: depth === 0 }}
@@ -242,16 +251,29 @@ export const notebookMenuItems: (
       key: "include-on-homepage",
       title: "Include notes on Homepage",
       isChecked: notebook.showOnHomepage !== false,
-      icon: Home.path,
+      icon: notebook.showOnHomepage === false ? HomeOff.path : Home.path,
       multiSelect: true,
       onClick: async () => {
         const state = notebook.showOnHomepage === false;
-        await db.notebooks.showOnHomepage(
-          state,
-          ...(ids.length ? ids : [notebook.id])
+        const targetIds = ids.length ? ids : [notebook.id];
+        const apply = async (value: boolean) => {
+          await db.notebooks.showOnHomepage(value, ...targetIds);
+          await useNotebookStore.getState().refresh();
+          await useNotesStore.getState().refresh();
+        };
+        await apply(state);
+        const hasChildren =
+          (await db.relations.from(notebook, "notebook").count()) > 0;
+        const name =
+          targetIds.length > 1 ? `${targetIds.length} notebooks` : notebook.title;
+        showToast(
+          "success",
+          (state
+            ? `${name}: notes shown on Notes – Homepage`
+            : `${name}: notes hidden from Notes – Homepage`) +
+            (hasChildren ? ". Sub-notebooks keep their own setting." : ""),
+          [{ text: "Undo", onClick: () => apply(!state) }]
         );
-        await useNotebookStore.getState().refresh();
-        await useNotesStore.getState().refresh();
       }
     },
     {
