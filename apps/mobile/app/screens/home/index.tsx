@@ -32,8 +32,13 @@ import { useNotes } from "../../stores/use-notes-store";
 import { openEditor } from "../notes/common";
 import { db } from "../../common/database";
 
+// Fork: label the filtered main list so it is clear it is the homepage view.
+const HOMEPAGE_TITLE = "Notes – Homepage";
+
 export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
   const [notes, loading] = useNotes();
+  const title =
+    route.name === "Notes" ? HOMEPAGE_TITLE : strings.routes[route.name]();
 
   const isFocused = useNavigationFocus(navigation, {
     onFocus: (prev) => {
@@ -52,7 +57,7 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
     <>
       <Header
         renderedInRoute={route.name}
-        title={strings.routes[route.name]()}
+        title={title}
         canGoBack={false}
         hasSearch={true}
         onSearch={() => {
@@ -75,7 +80,7 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
           groupType="home"
           renderedInRoute={route.name}
           loading={loading || !isFocused}
-          headerTitle={strings.routes[route.name]()}
+          headerTitle={title}
           placeholder={{
             title: route.name?.toLowerCase(),
             paragraph: strings.notesEmpty(),

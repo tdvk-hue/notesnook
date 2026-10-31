@@ -148,6 +148,10 @@ android {
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         missingDimensionStrategy "store", "play"
+        // Fork: install side by side with the official app (-PforkBuild=true)
+        if (project.hasProperty("forkBuild") && project.forkBuild == "true") {
+            applicationIdSuffix ".homefork"
+        }
     }
 
     splits {

@@ -42,7 +42,8 @@ class NoteStore extends BaseStore<NoteStore> {
   };
 
   refresh = async () => {
-    const grouping = await db.notes.all.grouped(
+    // Fork: homepage list excludes notes whose notebooks are all hidden.
+    const grouping = await db.notes.homepage.grouped(
       db.settings.getGroupOptions("home")
     );
     this.set((state) => {

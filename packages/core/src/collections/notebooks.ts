@@ -73,6 +73,7 @@ export class Notebooks implements ICollection {
       title: mergedNotebook.title,
       description: mergedNotebook.description,
       pinned: !!mergedNotebook.pinned,
+      showOnHomepage: mergedNotebook.showOnHomepage !== false,
 
       dateCreated: mergedNotebook.dateCreated || Date.now(),
       dateModified: mergedNotebook.dateModified || Date.now(),
@@ -111,6 +112,13 @@ export class Notebooks implements ICollection {
 
   async pin(state: boolean, ...ids: string[]) {
     await this.collection.update(ids, { pinned: state });
+  }
+
+  /**
+   * Fork addition: include or exclude this notebook's notes on the homepage.
+   */
+  async showOnHomepage(state: boolean, ...ids: string[]) {
+    await this.collection.update(ids, { showOnHomepage: state });
   }
 
   async totalNotes(...ids: string[]) {

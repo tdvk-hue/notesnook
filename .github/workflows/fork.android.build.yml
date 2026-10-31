@@ -1,0 +1,96 @@
+name: Fork - Homepage filter APK
+
+# Builds an installable arm64 APK of the fork (signed with the repo's public
+# debug keystore, application id suffixed ".homefork" so it installs next to
+# the official Notesnook app). Also runs the core tests for the homepage filter.
+# Download the APK from the run's "Artifacts" section.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [homepage-filter]
+
+concurrency:
+  group: fork-android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  core-tests:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Install
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=core
+
+      - name: Type check core
+        run: cd packages/core && npx tsc --noEmit
+
+      - name: Homepage filter tests
+        run: cd packages/core && npx vitest run __tests__/homepage.test.ts __tests__/notebooks.test.js __tests__/notes.test.ts __tests__/migrations.test.ts __tests__/sql-migrations.test.ts
+
+  android:
+    needs: core-tests
+    runs-on: ubuntu-22.04
+    env:
+      STAGING_BUILD: true
+    steps:
+      - uses: actions/checkout@v5
+
+      # LFS objects (prebuilt .aar files) live in the upstream repo, not in
+      # forks, so fetch them from upstream.
+      - name: Pull Git LFS files from upstream
+        run: |
+          git config lfs.url https://github.com/streetwriters/notesnook.git/info/lfs
+          git lfs install --local
+          git lfs pull
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: false
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+
+      - name: Install node modules
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=mobile
+
+      - name: Build packages and type check mobile
+        run: |
+          npm run tx mobile:build
+          cd apps/mobile
+          npx tsc --noEmit
+
+      - name: Build arm64-v8a APK
+        run: |
+          cd apps/mobile/android
+          chmod +x ./gradlew
+          ./gradlew :app:assembleRelease -PreactNativeArchitectures=arm64-v8a -PstagingReleaseBuild=true -PforkBuild=true -PprBuildNumber=$(( ${{ github.run_number }} + 10000 ))
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: notesnook-homefork-arm64
+          path: apps/mobile/android/app/build/outputs/apk/release/app-arm64-v8a-release.apk
+          if-no-files-found: error
+          retention-days: 14

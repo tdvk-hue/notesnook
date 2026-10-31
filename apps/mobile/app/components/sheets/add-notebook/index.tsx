@@ -40,6 +40,9 @@ import { getElevationStyle } from "../../../utils/elevation";
 import { defaultBorderRadius } from "../../../utils/size";
 import { useThemeColors } from "@notesnook/theme";
 import { getContainerBorder } from "../../../utils/colors";
+import ToggleSwitch from "toggle-switch-react-native";
+import Paragraph from "../../ui/typography/paragraph";
+import { useNoteStore } from "../../../stores/use-notes-store";
 
 export const AddNotebookSheet = ({
   notebook,
@@ -60,6 +63,10 @@ export const AddNotebookSheet = ({
   const titleInput = useRef<TextInput>(null);
   const descriptionInput = useRef<TextInput>(null);
   const [loading, setLoading] = useState(false);
+  // Fork: "Include notes on Homepage" (default on for new notebooks).
+  const [showOnHomepage, setShowOnHomepage] = useState(
+    notebook?.showOnHomepage !== false
+  );
 
   const onSaveChanges = async () => {
     if (loading) return;
@@ -78,7 +85,8 @@ export const AddNotebookSheet = ({
     const id = await db.notebooks.add({
       title: title.current,
       description: description.current,
-      id: notebook?.id
+      id: notebook?.id,
+      showOnHomepage
     });
 
     if (parentNotebook && id) {
@@ -92,6 +100,7 @@ export const AddNotebookSheet = ({
     Navigation.queueRoutesForUpdate();
     useRelationStore.getState().update();
     useNotebookStore.getState().refresh();
+    useNoteStore.getState().refresh();
 
     const parent =
       parentNotebook?.id ||
@@ -174,6 +183,26 @@ export const AddNotebookSheet = ({
           returnKeyType="next"
           defaultValue={notebook ? notebook.description : ""}
         />
+
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginTop: 12,
+            marginBottom: 4
+          }}
+        >
+          <Paragraph>Include notes on Homepage</Paragraph>
+          <ToggleSwitch
+            isOn={showOnHomepage}
+            onColor={colors.primary.accent}
+            offColor={colors.primary.icon}
+            size="small"
+            animationSpeed={150}
+            onToggle={() => setShowOnHomepage(!showOnHomepage)}
+          />
+        </View>
       </View>
       <DialogButtons
         onPressNegative={() => {

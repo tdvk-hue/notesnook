@@ -226,6 +226,12 @@ export interface Notebook extends BaseItem<"notebook"> {
   description?: string;
   dateEdited: number;
   pinned: boolean;
+  /**
+   * Fork addition: when false, notes that belong only to notebooks with
+   * this flag off are excluded from the homepage (main Notes list).
+   * Missing/null is treated as true.
+   */
+  showOnHomepage?: boolean;
 
   /**
    * @deprecated only kept here for migration purposes.

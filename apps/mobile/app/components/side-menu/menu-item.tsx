@@ -79,7 +79,7 @@ export function MenuItem({
         if (!item.data) {
           switch (item.id) {
             case "Notes":
-              setItemCount(await db.notes.all.count());
+              setItemCount(await db.notes.homepage.count());
               break;
             case "Favorites":
               setItemCount(await db.notes.favorites.count());

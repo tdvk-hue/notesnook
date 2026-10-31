@@ -247,6 +247,11 @@ const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
     row.conflicted = row.conflicted === 1;
     if (row.expiryDate) row.expiryDate = JSON.parse(row.expiryDate);
   },
+  notebook: (row) => {
+    // null/undefined (older rows, other clients) means "show on homepage"
+    row.showOnHomepage =
+      row.showOnHomepage !== 0 && row.showOnHomepage !== false;
+  },
   reminder: (row) => {
     if (row.selectedDays) row.selectedDays = JSON.parse(row.selectedDays);
   },

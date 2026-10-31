@@ -64,6 +64,7 @@ import { PinnedNotesWidget } from "../services/pinned-notes-widget";
 import SettingsService from "../services/settings";
 import { useArchivedStore } from "../stores/use-archived-store";
 import { useMenuStore } from "../stores/use-menu-store";
+import { useNoteStore } from "../stores/use-notes-store";
 import useNavigationStore from "../stores/use-navigation-store";
 import { useRelationStore } from "../stores/use-relation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
@@ -126,6 +127,7 @@ export type ActionId =
   | "remove-from-notebook"
   | "trash"
   | "default-homepage"
+  | "homepage-visibility"
   | "default-tag"
   | "launcher-shortcut"
   | "expiry-date"
@@ -701,6 +703,24 @@ export const useActions = ({
         }
       }
     );
+  }
+
+  if (item.type === "notebook") {
+    // Fork: per-notebook "Include notes on Homepage" toggle (default on).
+    const includedOnHomepage = item.showOnHomepage !== false;
+    actions.push({
+      id: "homepage-visibility",
+      title: "Include notes on Homepage",
+      icon: includedOnHomepage ? "home-outline" : "home-off-outline",
+      isToggle: true,
+      checked: includedOnHomepage,
+      onPress: async () => {
+        await db.notebooks.showOnHomepage(!includedOnHomepage, item.id);
+        setItem((await db.notebooks.notebook(item.id)) as Item);
+        useNoteStore.getState().refresh();
+        Navigation.queueRoutesForUpdate();
+      }
+    });
   }
 
   if (item.type === "notebook" || item.type === "note") {

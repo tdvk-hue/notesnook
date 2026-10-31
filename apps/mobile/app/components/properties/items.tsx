@@ -75,6 +75,7 @@ const COLUMN_BAR_ITEMS: ActionId[] = [
   "default-notebook",
   "default-tag",
   "default-homepage",
+  "homepage-visibility",
   "add-shortcut",
   "reorder",
   "rename-color",

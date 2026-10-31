@@ -33,7 +33,8 @@ import {
   ArrowUp,
   Move,
   Copy,
-  InternalLink
+  InternalLink,
+  Home
 } from "../icons";
 import { MenuItem } from "@notesnook/ui";
 import { hashNavigate, navigate } from "../../navigation";
@@ -235,6 +236,24 @@ export const notebookMenuItems: (
       notebook.type,
       features.customHomepage
     ),
+    {
+      // Fork: per-notebook "Include notes on Homepage" toggle (default on).
+      type: "button",
+      key: "include-on-homepage",
+      title: "Include notes on Homepage",
+      isChecked: notebook.showOnHomepage !== false,
+      icon: Home.path,
+      multiSelect: true,
+      onClick: async () => {
+        const state = notebook.showOnHomepage === false;
+        await db.notebooks.showOnHomepage(
+          state,
+          ...(ids.length ? ids : [notebook.id])
+        );
+        await useNotebookStore.getState().refresh();
+        await useNotesStore.getState().refresh();
+      }
+    },
     {
       type: "button",
       key: "shortcut",

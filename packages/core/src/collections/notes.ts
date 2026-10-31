@@ -262,6 +262,63 @@ export class Notes implements ICollection {
     );
   }
 
+  /**
+   * Fork addition: the homepage ("Notes – Homepage") list.
+   * Same as `all`, except notes are hidden when every live notebook they
+   * belong to has `showOnHomepage` turned off. Unfiled notes always show.
+   * A note in at least one visible notebook shows. Trashed notebooks are
+   * ignored.
+   */
+  get homepage() {
+    const notebookNotes = (visible: boolean) =>
+      this.db
+        .sql()
+        .selectFrom("relations")
+        .innerJoin("notebooks", "notebooks.id", "relations.fromId")
+        .where("relations.fromType", "==", "notebook")
+        .where("relations.toType", "==", "note")
+        .where((eb) =>
+          eb.and([
+            eb.or([
+              eb("relations.deleted", "is", null),
+              eb("relations.deleted", "==", false)
+            ]),
+            eb.or([
+              eb("notebooks.dateDeleted", "is", null),
+              eb("notebooks.dateDeleted", "==", 0)
+            ]),
+            eb.or([
+              eb("notebooks.deleted", "is", null),
+              eb("notebooks.deleted", "==", false)
+            ])
+          ])
+        )
+        .where((eb) =>
+          visible
+            ? eb.or([
+                eb("notebooks.showOnHomepage", "is", null),
+                eb("notebooks.showOnHomepage", "!=", false)
+              ])
+            : eb("notebooks.showOnHomepage", "==", false)
+        )
+        .select("relations.toId");
+
+    return this.collection.createFilter<Note>(
+      (qb) =>
+        qb
+          .where(isFalse("dateDeleted"))
+          .where(isFalse("deleted"))
+          .where(isFalse("archived"))
+          .where((eb) =>
+            eb.or([
+              eb("notes.id", "not in", notebookNotes(false)),
+              eb("notes.id", "in", notebookNotes(true))
+            ])
+          ),
+      this.db.options?.batchSize
+    );
+  }
+
   get exportable() {
     return this.collection.createFilter<Note>(
       (qb) => qb.where(isFalse("dateDeleted")).where(isFalse("deleted")),

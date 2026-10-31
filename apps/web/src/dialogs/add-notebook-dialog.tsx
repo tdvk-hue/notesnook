@@ -29,6 +29,7 @@ import { db } from "../common/db";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { checkFeature, truncateString } from "../common";
+import { Checkbox, Label } from "@theme-ui/components";
 
 type AddNotebookDialogProps = BaseDialogProps<boolean> & {
   parentId?: string;
@@ -41,6 +42,8 @@ export const AddNotebookDialog = DialogManager.register(
     const { notebook, onClose, parentId } = props;
     const title = useRef<string>(notebook?.title || "");
     const description = useRef<string>(notebook?.description || "");
+    // Fork: "Include notes on Homepage" (default on for new notebooks).
+    const showOnHomepage = useRef<boolean>(notebook?.showOnHomepage !== false);
 
     const onSubmit = useCallback(async () => {
       if (!title.current.trim())
@@ -49,7 +52,8 @@ export const AddNotebookDialog = DialogManager.register(
       const id = await db.notebooks.add({
         id: props.notebook?.id,
         title: title.current,
-        description: description.current
+        description: description.current,
+        showOnHomepage: showOnHomepage.current
       });
       if (!id) return;
 
@@ -117,6 +121,20 @@ export const AddNotebookDialog = DialogManager.register(
           helpText={strings.optional()}
           sx={{ mt: 1 }}
         />
+        <Label
+          htmlFor="show-on-homepage"
+          sx={{ mt: 2, alignItems: "center", fontSize: "body", color: "paragraph" }}
+        >
+          <Checkbox
+            id="show-on-homepage"
+            name="show-on-homepage"
+            data-test-id="show-on-homepage-checkbox"
+            defaultChecked={showOnHomepage.current}
+            onChange={(e) => (showOnHomepage.current = e.target.checked)}
+            sx={{ mr: "small", width: 18, height: 18 }}
+          />
+          Include notes on Homepage
+        </Label>
       </Dialog>
     );
   },
