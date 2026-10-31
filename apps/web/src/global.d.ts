@@ -24,6 +24,8 @@ import "@notesnook/desktop/preload.d.ts";
 
 declare global {
   var PUBLIC_URL: string;
+  /** Fork: sub path the app is served from, "" at domain root */
+  var BASE_PATH: string;
   var APP_VERSION: string;
   var GIT_HASH: string;
   var IS_DESKTOP_APP: boolean;

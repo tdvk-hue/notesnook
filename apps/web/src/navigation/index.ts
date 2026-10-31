@@ -85,7 +85,11 @@ export function getQueryParams() {
 }
 
 export function getCurrentPath() {
-  return window.location.pathname || "/";
+  const path = window.location.pathname || "/";
+  // Fork: strip the hosting sub path so routes stay "/notes" etc.
+  if (BASE_PATH && path.startsWith(BASE_PATH))
+    return path.slice(BASE_PATH.length) || "/";
+  return path;
 }
 
 export function getCurrentHash() {
@@ -121,7 +125,12 @@ export function hardNavigate(route: string, search?: string) {
 }
 
 export function makeURL(route: string, hash?: string, search?: string) {
-  const url = new URL(route, window.location.origin);
+  const url = new URL(
+    BASE_PATH && route.startsWith("/") && !route.startsWith(BASE_PATH + "/")
+      ? BASE_PATH + route
+      : route,
+    window.location.origin
+  );
   if (!url.hash) url.hash = hash || getCurrentHash();
   url.search = search || getQueryString();
   return url;
