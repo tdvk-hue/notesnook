@@ -37,8 +37,8 @@ const HOMEPAGE_TITLE = "All notes";
 
 export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
   const [notes, loading] = useNotes();
-  const title =
-    route.name === "Notes" ? HOMEPAGE_TITLE : strings.routes[route.name]();
+  // This screen only renders the Notes route, which is the All notes list.
+  const title = HOMEPAGE_TITLE;
 
   const isFocused = useNavigationFocus(navigation, {
     onFocus: (prev) => {

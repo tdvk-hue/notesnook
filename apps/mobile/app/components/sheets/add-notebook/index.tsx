@@ -40,6 +40,7 @@ import { getElevationStyle } from "../../../utils/elevation";
 import { defaultBorderRadius } from "../../../utils/size";
 import { useThemeColors } from "@notesnook/theme";
 import { getContainerBorder } from "../../../utils/colors";
+//@ts-ignore (no type declarations, same as the other screens)
 import ToggleSwitch from "toggle-switch-react-native";
 import Paragraph from "../../ui/typography/paragraph";
 import { useNoteStore } from "../../../stores/use-notes-store";

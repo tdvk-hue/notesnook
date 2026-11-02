@@ -745,7 +745,7 @@ export const useActions = ({
           actionText: "Undo",
           func: () => {
             ToastManager.hide();
-            apply(includedOnHomepage);
+            apply(shown);
           }
         });
       }
