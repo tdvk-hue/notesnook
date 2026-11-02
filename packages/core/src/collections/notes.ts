@@ -267,7 +267,8 @@ export class Notes implements ICollection {
    * Same as `all`, except notes are hidden when every live notebook they
    * belong to has `showOnHomepage` turned off. Unfiled notes always show.
    * A note in at least one visible notebook shows. Trashed notebooks are
-   * ignored.
+   * ignored. A note with ANY hidden tag never shows (tags are "keep off"
+   * labels, unlike notebooks).
    */
   get homepage() {
     const notebookNotes = (visible: boolean) =>
@@ -306,6 +307,26 @@ export class Notes implements ICollection {
         .select("relations.toId")
         .$castTo<{ toId: string }>();
 
+    const hiddenTagNotes = this.db
+      .sql()
+      .selectFrom("relations")
+      .innerJoin("tags", "tags.id", "relations.fromId")
+      .where("relations.fromType", "==", "tag")
+      .where("relations.toType", "==", "note")
+      .where("relations.toId", "is not", null)
+      .where((eb) =>
+        eb.and([
+          eb.or([
+            eb("relations.deleted", "is", null),
+            eb("relations.deleted", "==", false)
+          ]),
+          eb.or([eb("tags.deleted", "is", null), eb("tags.deleted", "==", false)])
+        ])
+      )
+      .where("tags.showOnHomepage", "==", false)
+      .select("relations.toId")
+      .$castTo<{ toId: string }>();
+
     return this.collection.createFilter<Note>(
       (qb) =>
         qb
@@ -317,7 +338,8 @@ export class Notes implements ICollection {
               eb("notes.id", "not in", notebookNotes(false)),
               eb("notes.id", "in", notebookNotes(true))
             ])
-          ),
+          )
+          .where("notes.id", "not in", hiddenTagNotes),
       this.db.options?.batchSize
     );
   }

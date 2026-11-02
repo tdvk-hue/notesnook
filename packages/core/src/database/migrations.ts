@@ -506,6 +506,17 @@ export class NNMigrationProvider implements MigrationProvider {
               .execute();
           });
         }
+      },
+      // Fork addition: tags can be hidden from the homepage too.
+      "a-2026-11-02": {
+        async up(db) {
+          await ensureColumn(db, "tags", "showOnHomepage", async () => {
+            await db.schema
+              .alterTable("tags")
+              .addColumn("showOnHomepage", "boolean", (c) => c.defaultTo(true))
+              .execute();
+          });
+        }
       }
     };
   }

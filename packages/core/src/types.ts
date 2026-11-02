@@ -314,6 +314,11 @@ export interface Color extends BaseItem<"color"> {
 
 export interface Tag extends BaseItem<"tag"> {
   title: string;
+  /**
+   * Fork addition: when false, notes with this tag stay off the homepage
+   * list (any hidden tag is enough). Defaults to true.
+   */
+  showOnHomepage?: boolean;
 
   /**
    * @deprecated only kept here for migration purposes.

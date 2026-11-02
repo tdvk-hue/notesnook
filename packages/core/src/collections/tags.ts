@@ -71,9 +71,17 @@ export class Tags implements ICollection {
       dateCreated: item.dateCreated || Date.now(),
       dateModified: item.dateModified || Date.now(),
       title: item.title,
-      type: "tag"
+      type: "tag",
+      showOnHomepage: item.showOnHomepage !== false
     });
     return id;
+  }
+
+  /**
+   * Fork addition: show or hide notes with these tags on the homepage.
+   */
+  async showOnHomepage(state: boolean, ...ids: string[]) {
+    await this.collection.update(ids, { showOnHomepage: state });
   }
 
   // get raw() {

@@ -252,6 +252,11 @@ const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
     row.showOnHomepage =
       row.showOnHomepage !== 0 && row.showOnHomepage !== false;
   },
+  tag: (row) => {
+    // null/undefined (older rows, other clients) means "show on homepage"
+    row.showOnHomepage =
+      row.showOnHomepage !== 0 && row.showOnHomepage !== false;
+  },
   reminder: (row) => {
     if (row.selectedDays) row.selectedDays = JSON.parse(row.selectedDays);
   },

@@ -139,3 +139,87 @@ test("trashed hidden notebook no longer hides its notes", () =>
 
     expect(await homepageIds(db)).toContain(ids.inHidden);
   }));
+
+// Tags: any hidden tag keeps a note off the homepage.
+
+async function tagNote(db: Database, title: string, noteId: string) {
+  const id = await db.tags.add({ title });
+  await db.relations.add({ type: "tag", id }, { type: "note", id: noteId });
+  return id;
+}
+
+test("new tags default to showing on homepage", () =>
+  databaseTest().then(async (db) => {
+    const id = await db.tags.add({ title: "fresh" });
+    expect((await db.tags.tag(id))?.showOnHomepage).toBe(true);
+  }));
+
+test("a hidden tag hides the note even in a visible notebook", () =>
+  databaseTest().then(async (db) => {
+    const ids = await setup(db);
+    const tag = await tagNote(db, "private", ids.inVisible);
+    await db.tags.showOnHomepage(false, tag);
+
+    const home = await homepageIds(db);
+    expect(home).not.toContain(ids.inVisible);
+    expect(home).toContain(ids.unfiled);
+    expect(home).toContain(ids.inBoth);
+  }));
+
+test("any hidden tag is enough, even with a shown tag", () =>
+  databaseTest().then(async (db) => {
+    const ids = await setup(db);
+    const hidden = await tagNote(db, "private", ids.unfiled);
+    await tagNote(db, "todo", ids.unfiled);
+    await db.tags.showOnHomepage(false, hidden);
+    expect(await homepageIds(db)).not.toContain(ids.unfiled);
+  }));
+
+test("a hidden tag hides a note with no notebook", () =>
+  databaseTest().then(async (db) => {
+    const ids = await setup(db);
+    const tag = await tagNote(db, "private", ids.unfiled);
+    await db.tags.showOnHomepage(false, tag);
+    expect(await homepageIds(db)).not.toContain(ids.unfiled);
+    // other views unchanged
+    expect((await db.notes.all.ids()).length).toBe(4);
+  }));
+
+test("showing the tag again restores its notes", () =>
+  databaseTest().then(async (db) => {
+    const ids = await setup(db);
+    const tag = await tagNote(db, "private", ids.unfiled);
+    await db.tags.showOnHomepage(false, tag);
+    await db.tags.showOnHomepage(true, tag);
+    expect(await homepageIds(db)).toContain(ids.unfiled);
+  }));
+
+test("renaming a tag keeps its homepage flag", () =>
+  databaseTest().then(async (db) => {
+    const ids = await setup(db);
+    const tag = await tagNote(db, "private", ids.unfiled);
+    await db.tags.showOnHomepage(false, tag);
+    await db.tags.add({ id: tag, title: "secret" });
+    const t = await db.tags.tag(tag);
+    expect(t?.title).toBe("secret");
+    expect(t?.showOnHomepage).toBe(false);
+    expect(await homepageIds(db)).not.toContain(ids.unfiled);
+  }));
+
+test("deleting a hidden tag brings its notes back", () =>
+  databaseTest().then(async (db) => {
+    const ids = await setup(db);
+    const tag = await tagNote(db, "private", ids.unfiled);
+    await db.tags.showOnHomepage(false, tag);
+    await db.tags.remove(tag);
+    expect(await homepageIds(db)).toContain(ids.unfiled);
+  }));
+
+test("hidden tag and hidden notebook rules combine", () =>
+  databaseTest().then(async (db) => {
+    const ids = await setup(db);
+    await db.notebooks.showOnHomepage(false, ids.hiddenNb);
+    const tag = await tagNote(db, "private", ids.inVisible);
+    await db.tags.showOnHomepage(false, tag);
+    expect(await homepageIds(db)).toEqual([ids.unfiled, ids.inBoth].sort());
+  }));
