@@ -44,7 +44,7 @@ const routes = defineRoutes({
       key: "home",
       type: "notes",
       // Fork: label the filtered main list as the homepage.
-      title: "Notes – Homepage",
+      title: "All notes",
       component: AllNotes,
       buttons: {
         create: CREATE_BUTTON_MAP.notes,

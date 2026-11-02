@@ -705,29 +705,38 @@ export const useActions = ({
     );
   }
 
-  if (item.type === "notebook") {
-    // Fork: per-notebook "Include notes on Homepage" toggle (default on).
-    const includedOnHomepage = item.showOnHomepage !== false;
+  if (item.type === "notebook" || item.type === "tag") {
+    // Fork: hide a notebook's or tag's notes from All notes (default shown).
+    // A note stays off All notes when all its notebooks are hidden, or when
+    // any of its tags is hidden.
+    const shown = item.showOnHomepage !== false;
     actions.push({
       id: "homepage-visibility",
-      title: "Include notes on Homepage",
-      icon: includedOnHomepage ? "home-outline" : "home-off-outline",
+      title: shown ? "Hide from All notes" : "Hidden from All notes",
+      icon: "eye-off-outline",
       isToggle: true,
-      checked: includedOnHomepage,
+      checked: !shown,
       onPress: async () => {
         const apply = async (value: boolean) => {
-          await db.notebooks.showOnHomepage(value, item.id);
-          setItem((await db.notebooks.notebook(item.id)) as Item);
+          if (item.type === "tag") {
+            await db.tags.showOnHomepage(value, item.id);
+            setItem((await db.tags.tag(item.id)) as Item);
+          } else {
+            await db.notebooks.showOnHomepage(value, item.id);
+            setItem((await db.notebooks.notebook(item.id)) as Item);
+          }
           useNoteStore.getState().refresh();
           Navigation.queueRoutesForUpdate();
         };
-        await apply(!includedOnHomepage);
+        await apply(!shown);
+        const name = item.type === "tag" ? "#" + item.title : item.title;
         const hasChildren =
+          item.type === "notebook" &&
           (await db.relations.from(item, "notebook").count()) > 0;
         ToastManager.show({
-          heading: includedOnHomepage
-            ? "Notes hidden from Notes \u2013 Homepage"
-            : "Notes shown on Notes \u2013 Homepage",
+          heading: shown
+            ? `${name} hidden from All notes`
+            : `${name} is back on All notes`,
           message: hasChildren
             ? "Sub-notebooks keep their own setting."
             : undefined,

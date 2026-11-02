@@ -32,8 +32,8 @@ import { useNotes } from "../../stores/use-notes-store";
 import { openEditor } from "../notes/common";
 import { db } from "../../common/database";
 
-// Fork: label the filtered main list so it is clear it is the homepage view.
-const HOMEPAGE_TITLE = "Notes – Homepage";
+// Fork: the main list is called "All notes".
+const HOMEPAGE_TITLE = "All notes";
 
 export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
   const [notes, loading] = useNotes();

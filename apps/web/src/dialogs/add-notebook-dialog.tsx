@@ -42,7 +42,7 @@ export const AddNotebookDialog = DialogManager.register(
     const { notebook, onClose, parentId } = props;
     const title = useRef<string>(notebook?.title || "");
     const description = useRef<string>(notebook?.description || "");
-    // Fork: "Include notes on Homepage" (default on for new notebooks).
+    // Fork: shown on All notes unless hidden (default shown).
     const showOnHomepage = useRef<boolean>(notebook?.showOnHomepage !== false);
 
     const onSubmit = useCallback(async () => {
@@ -129,11 +129,11 @@ export const AddNotebookDialog = DialogManager.register(
             id="show-on-homepage"
             name="show-on-homepage"
             data-test-id="show-on-homepage-checkbox"
-            defaultChecked={showOnHomepage.current}
-            onChange={(e) => (showOnHomepage.current = e.target.checked)}
+            defaultChecked={!showOnHomepage.current}
+            onChange={(e) => (showOnHomepage.current = !e.target.checked)}
             sx={{ mr: "small", width: 18, height: 18 }}
           />
-          Include notes on Homepage
+          Hide from All notes
         </Label>
       </Dialog>
     );

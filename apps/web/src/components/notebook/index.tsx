@@ -34,8 +34,7 @@ import {
   Move,
   Copy,
   InternalLink,
-  Home,
-  HomeOff
+  Privacy
 } from "../icons";
 import { MenuItem } from "@notesnook/ui";
 import { hashNavigate, navigate } from "../../navigation";
@@ -178,8 +177,8 @@ export function Notebook(props: NotebookProps) {
           </Text>
           {item.showOnHomepage === false ? (
             // Fork: passive marker; the setting itself lives in the menu
-            <Flex title="Hidden from Notes – Homepage">
-              <HomeOff size={12} color="icon" />
+            <Flex title="Hidden from All notes">
+              <Privacy size={12} color="icon" />
             </Flex>
           ) : null}
         </Flex>
@@ -246,12 +245,12 @@ export const notebookMenuItems: (
       features.customHomepage
     ),
     {
-      // Fork: per-notebook "Include notes on Homepage" toggle (default on).
+      // Fork: hide this notebook's notes from All notes (default shown).
       type: "button",
       key: "include-on-homepage",
-      title: "Include notes on Homepage",
-      isChecked: notebook.showOnHomepage !== false,
-      icon: notebook.showOnHomepage === false ? HomeOff.path : Home.path,
+      title: "Hide from All notes",
+      isChecked: notebook.showOnHomepage === false,
+      icon: Privacy.path,
       multiSelect: true,
       onClick: async () => {
         const state = notebook.showOnHomepage === false;
@@ -269,8 +268,8 @@ export const notebookMenuItems: (
         showToast(
           "success",
           (state
-            ? `${name}: notes shown on Notes – Homepage`
-            : `${name}: notes hidden from Notes – Homepage`) +
+            ? `${name} is back on All notes`
+            : `${name} hidden from All notes`) +
             (hasChildren ? ". Sub-notebooks keep their own setting." : ""),
           [{ text: "Undo", onClick: () => apply(!state) }]
         );

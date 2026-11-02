@@ -31,6 +31,7 @@ import Paragraph from "../../ui/typography/paragraph";
 import SelectionWrapper, { selectItem } from "../selection-wrapper";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../../utils/styles";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 const TagItem = React.memo(
   ({
@@ -80,6 +81,15 @@ const TagItem = React.memo(
             }}
           >
             {strings.notes(totalNotes)}
+            {item.showOnHomepage === false ? "  " : ""}
+            {item.showOnHomepage === false ? (
+              // Fork: passive marker; the setting lives in the tag sheet
+              <Icon
+                name="eye-off-outline"
+                size={AppFontSize.xs}
+                color={colors.secondary.icon}
+              />
+            ) : null}
           </Paragraph>
         </View>
 

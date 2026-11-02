@@ -155,6 +155,15 @@ const TagItem = (props: {
             >
               {item?.title}
             </Paragraph>
+            {item?.showOnHomepage === false ? (
+              // Fork: hidden from All notes
+              <AppIcon
+                size={AppFontSize.xs}
+                color={colors.secondary.icon}
+                name="eye-off-outline"
+                style={{ marginLeft: 6 }}
+              />
+            ) : null}
           </View>
 
           {enabled ? (

@@ -63,7 +63,7 @@ export const AddNotebookSheet = ({
   const titleInput = useRef<TextInput>(null);
   const descriptionInput = useRef<TextInput>(null);
   const [loading, setLoading] = useState(false);
-  // Fork: "Include notes on Homepage" (default on for new notebooks).
+  // Fork: shown on All notes unless hidden (default shown).
   const [showOnHomepage, setShowOnHomepage] = useState(
     notebook?.showOnHomepage !== false
   );
@@ -193,9 +193,9 @@ export const AddNotebookSheet = ({
             marginBottom: 4
           }}
         >
-          <Paragraph>Include notes on Homepage</Paragraph>
+          <Paragraph>Hide from All notes</Paragraph>
           <ToggleSwitch
-            isOn={showOnHomepage}
+            isOn={!showOnHomepage}
             onColor={colors.primary.accent}
             offColor={colors.primary.icon}
             size="small"

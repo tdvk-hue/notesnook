@@ -133,7 +133,7 @@ type Route = {
 
 const routes: Route[] = [
   // Fork: make it obvious this is the filtered homepage list
-  { id: "notes", title: "Notes – Homepage", path: "/notes", icon: Home },
+  { id: "notes", title: "All notes", path: "/notes", icon: Note },
   {
     id: "favorites",
     title: strings.routes.Favorites(),

@@ -161,7 +161,7 @@ export const NotebookItem = ({
             {(item as Notebook).showOnHomepage === false ? (
               // Fork: passive marker; the setting lives in the notebook sheet
               <Icon
-                name="home-off-outline"
+                name="eye-off-outline"
                 size={AppFontSize.sm}
                 style={{
                   marginRight: 10,

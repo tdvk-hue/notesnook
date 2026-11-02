@@ -8,7 +8,7 @@ name: Fork - Homepage filter APK
 on:
   workflow_dispatch:
   push:
-    branches: [homepage-filter]
+    branches: [homepage-filter, "port-*"]
 
 concurrency:
   group: fork-android-${{ github.ref }}

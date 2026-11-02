@@ -369,7 +369,7 @@ export const FocusMode = createIcon(mdiGlasses);
 export const NormalMode = createIcon(mdiSunglasses);
 export const Settings = createIcon(mdiCogOutline);
 export const Home = createIcon(mdiHomeOutline);
-// Fork: shown on notebooks whose notes are kept off Notes – Homepage
+// Fork: shown on notebooks whose notes are kept off All notes
 export const HomeOff = createIcon(mdiHomeOffOutline);
 export const Restore = createIcon(mdiRecycle);
 export const Sync = createIcon(mdiSync);

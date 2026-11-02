@@ -263,7 +263,7 @@ export class Notes implements ICollection {
   }
 
   /**
-   * Fork addition: the homepage ("Notes – Homepage") list.
+   * Fork addition: the "All notes" list.
    * Same as `all`, except notes are hidden when every live notebook they
    * belong to has `showOnHomepage` turned off. Unfiled notes always show.
    * A note in at least one visible notebook shows. Trashed notebooks are
